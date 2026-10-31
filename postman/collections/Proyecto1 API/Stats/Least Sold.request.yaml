@@ -1,0 +1,5 @@
+$kind: http-request
+name: Least Sold
+url: http://localhost:8080/orders/least-sold
+method: GET
+order: 3441216723288195

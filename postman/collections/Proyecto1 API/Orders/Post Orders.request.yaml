@@ -1,0 +1,14 @@
+$kind: http-request
+name: Post Orders
+url: http://localhost:8080/orders
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"total\": 0,\r
+
+    \  \"terminalId\": 1\r
+
+    }"
+order: 3861945381983836

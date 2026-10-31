@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:8080/products?minPrice=5
+method: GET
+queryParams:
+  minPrice: "5"
+order: 3519051426602955

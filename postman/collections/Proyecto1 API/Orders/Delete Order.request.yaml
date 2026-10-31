@@ -1,0 +1,5 @@
+$kind: http-request
+name: Delete Order
+url: http://localhost:8080/orders
+method: DELETE
+order: 4351219515458574

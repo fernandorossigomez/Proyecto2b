@@ -1,0 +1,5 @@
+$kind: http-request
+name: Post
+url: http://localhost:8080/products
+method: POST
+order: 3544155564282905
