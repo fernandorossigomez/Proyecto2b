@@ -24,6 +24,9 @@ public class DataLoader {
             OrderProductRepository orderProductRepository
     ) {
         return args -> {
+            if (productRepository.count() > 0) {
+                return;
+            }
 
             // =========================
             // CATEGORÍAS
