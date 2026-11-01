@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -36,6 +37,7 @@ public class OrderService {
         this.orderProductRepository = orderProductRepository;
     }
 
+    @Transactional
     public OrderResponse addProduct(Long orderId, AddProductRequest request) {
 
         OrderEntity order = orderRepository.findById(orderId)
@@ -85,6 +87,7 @@ public class OrderService {
         return mapToResponse(order);
     }
     // Eliminar producto de un pedido
+    @Transactional
     public OrderResponse removeProduct(Long orderId, Long productId) {
 
         OrderEntity order = orderRepository.findById(orderId)
@@ -118,6 +121,7 @@ public class OrderService {
     }
 
     //Pilla el producto más vendido
+    @Transactional(readOnly =true)
     public List<ProductStatsResponse> getMostSoldProduct() {
 
         Map<String, Integer> sales = new HashMap<>();
@@ -148,6 +152,7 @@ public class OrderService {
                         .build())
                 .toList();
     }
+    @Transactional(readOnly = true)
     public List<ProductStatsResponse> getLeastSoldProduct() {
 
         Map<String, Integer> sales = new HashMap<>();
@@ -179,6 +184,7 @@ public class OrderService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ProductStatsResponse> getTopProducts() {
 
         Map<String, Integer> sales = new HashMap<>();
@@ -239,6 +245,7 @@ public class OrderService {
         return mapToResponse(saved);
     }
     //Encontrar todos los pedidos
+    @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders(OrderStatus status){
 
         List<OrderEntity> orders;
@@ -255,6 +262,7 @@ public class OrderService {
     }
 
     //Encontrar solo uno por ID
+    @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long id){
         OrderEntity order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Pedido no encontrado"));
@@ -263,6 +271,7 @@ public class OrderService {
     }
 
     // Encontrar pedido por código público
+    @Transactional(readOnly = true )
     public OrderResponse getOrderByCode(String code) {
         OrderEntity order = orderRepository.findByCode(code)
                 .orElseThrow(() ->
