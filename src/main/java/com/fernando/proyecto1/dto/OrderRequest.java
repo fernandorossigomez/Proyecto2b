@@ -4,7 +4,6 @@ package com.fernando.proyecto1.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 @Data
@@ -16,6 +15,7 @@ public class OrderRequest {
     private Double total;
 
     @NotNull
+    @Positive
     @Schema(description = "ID del terminal", example = "1")
     private Long terminalId;
 }

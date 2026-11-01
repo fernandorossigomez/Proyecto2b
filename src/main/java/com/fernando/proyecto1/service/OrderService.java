@@ -9,6 +9,7 @@ import com.fernando.proyecto1.repository.ProductRepository;
 import com.fernando.proyecto1.repository.OrderProductRepository;
 import com.fernando.proyecto1.repository.TerminalRepository;
 import org.springframework.stereotype.Service;
+import com.fernando.proyecto1.exceptions.ProductNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,10 +39,20 @@ public class OrderService {
     public OrderResponse addProduct(Long orderId, AddProductRequest request) {
 
         OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
-
+                .orElseThrow(() ->
+                        new OrderNotFoundException("Pedido no encontrado"));
+        if (isFinalStatus(order.getStatus())) {
+            throw new IllegalArgumentException(
+                    "No se puede modificar un pedido finalizado");
+        }
         ProductEntity product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() ->
+                        new ProductNotFoundException("Producto no encontrado"));
+
+        if (!Boolean.TRUE.equals(product.getActive())) {
+            throw new IllegalArgumentException(
+                    "No se puede añadir un producto desactivado al pedido");
+        }
 
         OrderProductEntity existing = order.getProducts().stream()
                 .filter(p -> p.getProduct().getId().equals(product.getId()))
@@ -72,19 +83,26 @@ public class OrderService {
 
         return mapToResponse(order);
     }
-    //Delete
-    public OrderResponse removeProduct(Long orderId, Long productId){
+    // Eliminar producto de un pedido
+    public OrderResponse removeProduct(Long orderId, Long productId) {
 
         OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+                .orElseThrow(() ->
+                        new OrderNotFoundException("Pedido no encontrado"));
 
-        boolean removed = order.getProducts().removeIf(op ->
-                op.getProduct().getId().equals(productId)
-        );
-
-        if (!removed) {
-            throw new RuntimeException("El producto no está en el pedido");
+        if (isFinalStatus(order.getStatus())) {
+            throw new IllegalArgumentException(
+                    "No se puede modificar un pedido finalizado");
         }
+
+        OrderProductEntity orderProduct = order.getProducts().stream()
+                .filter(op -> op.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() ->
+                        new ProductNotFoundException(
+                                "El producto no está en el pedido"));
+
+        order.getProducts().remove(orderProduct);
 
         double total = order.getProducts().stream()
                 .mapToDouble(p -> p.getPrice() * p.getQuantity())
@@ -98,53 +116,103 @@ public class OrderService {
     }
 
     //Pilla el producto más vendido
-    public ProductStatsResponse getMostSoldProduct() {
+    public List<ProductStatsResponse> getMostSoldProduct() {
 
-        return orderRepository.findAll().stream()
+        Map<String, Integer> sales = new HashMap<>();
+
+        productRepository.findAll().forEach(product ->
+                sales.put(product.getName(), 0)
+        );
+
+        orderRepository.findAll().stream()
+                .filter(order -> order.getStatus() == OrderStatus.COMPLETED
+                        || order.getStatus() == OrderStatus.PICKED_UP)
                 .flatMap(order -> order.getProducts().stream())
-                .collect(Collectors.groupingBy(
-                        op -> op.getProduct().getName(),
-                        Collectors.summingInt(OrderProductEntity::getQuantity)
-                ))
-                .entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue())
+                .forEach(op -> sales.merge(
+                        op.getProduct().getName(),
+                        op.getQuantity(),
+                        Integer::sum
+                ));
+
+        int maxSales = sales.values().stream()
+                .max(Integer::compareTo)
+                .orElse(0);
+
+        return sales.entrySet().stream()
+                .filter(entry -> entry.getValue() == maxSales)
                 .map(entry -> ProductStatsResponse.builder()
                         .name(entry.getKey())
                         .totalSold(entry.getValue())
                         .build())
-                .orElse(null);
+                .toList();
     }
-    public ProductStatsResponse getLeastSoldProduct() {
+    public List<ProductStatsResponse> getLeastSoldProduct() {
 
-        return orderRepository.findAll().stream()
+        Map<String, Integer> sales = new HashMap<>();
+
+        productRepository.findAll().forEach(product ->
+                sales.put(product.getName(), 0)
+        );
+
+        orderRepository.findAll().stream()
+                .filter(order -> order.getStatus() == OrderStatus.COMPLETED
+                        || order.getStatus() == OrderStatus.PICKED_UP)
                 .flatMap(order -> order.getProducts().stream())
-                .collect(Collectors.groupingBy(
-                        op -> op.getProduct().getName(),
-                        Collectors.summingInt(OrderProductEntity::getQuantity)
-                ))
-                .entrySet()
-                .stream()
-                .min(Map.Entry.comparingByValue())
+                .forEach(op -> sales.merge(
+                        op.getProduct().getName(),
+                        op.getQuantity(),
+                        Integer::sum
+                ));
+
+        int minSales = sales.values().stream()
+                .min(Integer::compareTo)
+                .orElse(0);
+
+        return sales.entrySet().stream()
+                .filter(entry -> entry.getValue() == minSales)
                 .map(entry -> ProductStatsResponse.builder()
                         .name(entry.getKey())
                         .totalSold(entry.getValue())
                         .build())
-                .orElse(null);
+                .toList();
     }
 
     public List<ProductStatsResponse> getTopProducts() {
 
-        return orderRepository.findAll().stream()
+        Map<String, Integer> sales = new HashMap<>();
+
+        productRepository.findAll().forEach(product ->
+                sales.put(product.getName(), 0)
+        );
+
+        orderRepository.findAll().stream()
+                .filter(order -> order.getStatus() == OrderStatus.COMPLETED
+                        || order.getStatus() == OrderStatus.PICKED_UP)
                 .flatMap(order -> order.getProducts().stream())
-                .collect(Collectors.groupingBy(
-                        op -> op.getProduct().getName(),
-                        Collectors.summingInt(OrderProductEntity::getQuantity)
-                ))
-                .entrySet()
-                .stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .limit(3)
+                .forEach(op -> sales.merge(
+                        op.getProduct().getName(),
+                        op.getQuantity(),
+                        Integer::sum
+                ));
+
+        List<Map.Entry<String, Integer>> sortedSales = sales.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue()
+                        .reversed())
+                .toList();
+
+        if (sortedSales.size() <= 3) {
+            return sortedSales.stream()
+                    .map(entry -> ProductStatsResponse.builder()
+                            .name(entry.getKey())
+                            .totalSold(entry.getValue())
+                            .build())
+                    .toList();
+        }
+
+        int thirdPlaceSales = sortedSales.get(2).getValue();
+
+        return sortedSales.stream()
+                .filter(entry -> entry.getValue() >= thirdPlaceSales)
                 .map(entry -> ProductStatsResponse.builder()
                         .name(entry.getKey())
                         .totalSold(entry.getValue())
@@ -188,6 +256,15 @@ public class OrderService {
     public OrderResponse getOrderById(Long id){
         OrderEntity order = orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundException("Pedido no encontrado"));
+
+        return mapToResponse(order);
+    }
+
+    // Encontrar pedido por código público
+    public OrderResponse getOrderByCode(String code) {
+        OrderEntity order = orderRepository.findByCode(code)
+                .orElseThrow(() ->
+                        new OrderNotFoundException("Pedido no encontrado"));
 
         return mapToResponse(order);
     }

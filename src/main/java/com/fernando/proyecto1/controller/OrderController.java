@@ -64,6 +64,16 @@ public class OrderController {
         return orderService.getOrderById(id);
     }
 
+    // Buscar pedido por código público
+    @Operation(
+            summary = "Obtener pedido por código",
+            description = "Devuelve un pedido mediante su código público"
+    )
+    @GetMapping("/by-code/{code}")
+    public OrderResponse getOrderByCode(@PathVariable String code) {
+        return orderService.getOrderByCode(code);
+    }
+
     //Update
     @Operation(
             summary = "Actualizar pedido",
@@ -72,7 +82,7 @@ public class OrderController {
     @PutMapping("/{id}")
     public OrderResponse updateOrder(
             @PathVariable Long id,
-            @RequestBody OrderRequest request
+            @Valid @RequestBody OrderRequest request
     ) {
         return orderService.updateOrder(id, request);
     }
@@ -112,12 +122,12 @@ public class OrderController {
 
 
     @GetMapping("/most-sold")
-    public ResponseEntity<ProductStatsResponse> getMostSold() {
+    public ResponseEntity<List<ProductStatsResponse>> getMostSold() {
         return ResponseEntity.ok(orderService.getMostSoldProduct());
     }
 
     @GetMapping("/least-sold")
-    public ResponseEntity<ProductStatsResponse> getLeastSold() {
+    public ResponseEntity<List<ProductStatsResponse>> getLeastSold() {
         return ResponseEntity.ok(orderService.getLeastSoldProduct());
     }
 
