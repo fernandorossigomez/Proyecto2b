@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "orders")
@@ -26,7 +27,8 @@ public class OrderEntity {
 
     private LocalDateTime date;
 
-    private Double total;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

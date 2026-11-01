@@ -2,7 +2,7 @@ package com.fernando.proyecto1.dto;
 
 import lombok.Builder;
 import lombok.Data;
-
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class OrderResponse {
     private Long id;
     private String code;
     private LocalDateTime date;
-    private Double total;
+    private BigDecimal total;
     private String status;
 
 }

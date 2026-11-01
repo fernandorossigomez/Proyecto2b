@@ -9,6 +9,7 @@ import com.fernando.proyecto1.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import com.fernando.proyecto1.exceptions.CategoryNotFoundException;
 import com.fernando.proyecto1.exceptions.ProductNotFoundException;
+import java.math.BigDecimal;
 
 import java.util.List;
 
@@ -28,8 +29,8 @@ public class ProductService {
 
     // Obtener productos aplicando filtros
     public List<ProductResponse> getAllProducts(
-            Double minPrice,
-            Double maxPrice,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
             String name,
             Boolean active,
             Long categoryId,
@@ -37,9 +38,10 @@ public class ProductService {
             String sortDirection
     ) {
 
-        var products = productRepository.findAll().stream()
-                .filter(p -> minPrice == null || p.getPrice() >= minPrice)
-                .filter(p -> maxPrice == null || p.getPrice() <= maxPrice)
+        var products = productRepository.findAll().stream().filter(p -> minPrice == null ||
+                        p.getPrice().compareTo(minPrice) >= 0)
+                .filter(p -> maxPrice == null ||
+                        p.getPrice().compareTo(maxPrice) <= 0)
                 .filter(p -> name == null ||
                         p.getName().toLowerCase().contains(name.toLowerCase()))
                 .filter(p -> active == null || active.equals(p.getActive()))

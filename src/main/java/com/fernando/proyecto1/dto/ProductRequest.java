@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import java.math.BigDecimal;
+import jakarta.validation.constraints.DecimalMin;
 
 @Data
 public class ProductRequest {
@@ -14,9 +16,9 @@ public class ProductRequest {
     private String name;
 
     @NotNull(message = "El precio es obligatorio")
-    @Min(value = 0, message = "El precio no puede ser negativo")
+    @DecimalMin(value = "0.0", message = "El precio no puede ser negativo")
     @Schema(description = "Precio del producto", example = "9.99")
-    private Double price;
+    private BigDecimal price;
 
     @Schema(description = "Indica si el producto está activo", example = "true")
     private Boolean active = true;

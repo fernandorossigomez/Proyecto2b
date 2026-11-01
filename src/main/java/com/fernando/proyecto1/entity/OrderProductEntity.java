@@ -2,6 +2,7 @@ package com.fernando.proyecto1.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 
 @Entity
 @Data
@@ -24,5 +25,6 @@ public class OrderProductEntity {
 
     private Integer quantity;
 
-    private Double price;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
 }

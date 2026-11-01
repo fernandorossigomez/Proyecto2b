@@ -5,6 +5,7 @@ import com.fernando.proyecto1.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import java.math.BigDecimal;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,18 +45,18 @@ public class DataLoader {
             // =========================
             List<ProductEntity> products = productRepository.saveAll(List.of(
 
-                    ProductEntity.builder().name("Pizza").price(8.5).category(food).build(),
-                    ProductEntity.builder().name("Hamburguesa").price(6.5).category(food).build(),
-                    ProductEntity.builder().name("Patatas").price(3.5).category(food).build(),
-                    ProductEntity.builder().name("Wrap").price(5.5).category(food).build(),
-                    ProductEntity.builder().name("Ensalada").price(4.5).category(food).build(),
+                    ProductEntity.builder().name("Pizza").price(new BigDecimal("8.5")).category(food).build(),
+                    ProductEntity.builder().name("Hamburguesa").price(new BigDecimal("6.5")).category(food).build(),
+                    ProductEntity.builder().name("Patatas").price(new BigDecimal("3.5")).category(food).build(),
+                    ProductEntity.builder().name("Wrap").price(new BigDecimal("5.5")).category(food).build(),
+                    ProductEntity.builder().name("Ensalada").price(new BigDecimal("4.5")).category(food).build(),
 
-                    ProductEntity.builder().name("Agua").price(1.5).category(drink).build(),
-                    ProductEntity.builder().name("Cerveza").price(2.5).category(drink).build(),
-                    ProductEntity.builder().name("Refresco").price(2.0).category(drink).build(),
+                    ProductEntity.builder().name("Agua").price(new BigDecimal("1.5")).category(drink).build(),
+                    ProductEntity.builder().name("Cerveza").price(new BigDecimal("2.5")).category(drink).build(),
+                    ProductEntity.builder().name("Refresco").price(new BigDecimal("2.0")).category(drink).build(),
 
-                    ProductEntity.builder().name("Helado").price(3.0).category(dessert).build(),
-                    ProductEntity.builder().name("Tarta").price(4.0).category(dessert).build()
+                    ProductEntity.builder().name("Helado").price(new BigDecimal("3.0")).category(dessert).build(),
+                    ProductEntity.builder().name("Tarta").price(new BigDecimal("4.0")).category(dessert).build()
             ));
 
             // =========================
@@ -86,7 +87,7 @@ public class DataLoader {
                     .date(LocalDateTime.now())
                     .status(OrderStatus.COMPLETED)
                     .terminal(barra)
-                    .total(0.0)
+                    .total(BigDecimal.ZERO)
                     .build()
             );
 
@@ -94,7 +95,7 @@ public class DataLoader {
                     .order(o1)
                     .product(p.get(1)) // Hamburguesa
                     .quantity(2)
-                    .price(6.5)
+                    .price(new BigDecimal("6.50"))
                     .build()
             );
 
@@ -102,11 +103,11 @@ public class DataLoader {
                     .order(o1)
                     .product(p.get(7)) // Refresco
                     .quantity(2)
-                    .price(2.0)
+                    .price(new BigDecimal("2.00"))
                     .build()
             );
 
-            o1.setTotal((2 * 6.5) + (2 * 2.0));
+            o1.setTotal(new BigDecimal("17.00"));
             orderRepository.save(o1);
 
 
@@ -118,7 +119,7 @@ public class DataLoader {
                     .date(LocalDateTime.now())
                     .status(OrderStatus.PENDING)
                     .terminal(terraza)
-                    .total(0.0)
+                    .total(BigDecimal.ZERO)
                     .build()
             );
 
@@ -126,7 +127,7 @@ public class DataLoader {
                     .order(o2)
                     .product(p.get(0)) // Pizza
                     .quantity(1)
-                    .price(8.5)
+                    .price(new BigDecimal("8.50"))
                     .build()
             );
 
@@ -134,11 +135,11 @@ public class DataLoader {
                     .order(o2)
                     .product(p.get(6)) // Cerveza
                     .quantity(2)
-                    .price(2.5)
+                    .price(new BigDecimal("2.50"))
                     .build()
             );
 
-            o2.setTotal(8.5 + (2 * 2.5));
+            o2.setTotal(new BigDecimal("13.50"));
             orderRepository.save(o2);
 
 
@@ -150,7 +151,7 @@ public class DataLoader {
                     .date(LocalDateTime.now())
                     .status(OrderStatus.COMPLETED)
                     .terminal(sala)
-                    .total(0.0)
+                    .total(BigDecimal.ZERO)
                     .build()
             );
 
@@ -158,7 +159,7 @@ public class DataLoader {
                     .order(o3)
                     .product(p.get(3)) // Wrap
                     .quantity(1)
-                    .price(5.5)
+                    .price(new BigDecimal("5.50"))
                     .build()
             );
 
@@ -166,7 +167,7 @@ public class DataLoader {
                     .order(o3)
                     .product(p.get(5)) // Agua
                     .quantity(2)
-                    .price(1.5)
+                    .price(new BigDecimal("1.50"))
                     .build()
             );
 
@@ -174,11 +175,11 @@ public class DataLoader {
                     .order(o3)
                     .product(p.get(4)) // Ensalada
                     .quantity(1)
-                    .price(4.5)
+                    .price(new BigDecimal("4.50"))
                     .build()
             );
 
-            o3.setTotal(5.5 + (2 * 1.5) + 4.5);
+            o3.setTotal(new BigDecimal("13.00"));
             orderRepository.save(o3);
 
 
@@ -190,7 +191,7 @@ public class DataLoader {
                     .date(LocalDateTime.now())
                     .status(OrderStatus.PENDING)
                     .terminal(barra)
-                    .total(0.0)
+                    .total(BigDecimal.ZERO)
                     .build()
             );
 
@@ -198,7 +199,7 @@ public class DataLoader {
                     .order(o4)
                     .product(p.get(2)) // Patatas
                     .quantity(2)
-                    .price(3.5)
+                    .price(new BigDecimal("3.50"))
                     .build()
             );
 
@@ -206,7 +207,7 @@ public class DataLoader {
                     .order(o4)
                     .product(p.get(6)) // Cerveza
                     .quantity(1)
-                    .price(2.5)
+                    .price(new BigDecimal("2.50"))
                     .build()
             );
 
@@ -214,11 +215,11 @@ public class DataLoader {
                     .order(o4)
                     .product(p.get(7)) // Refresco
                     .quantity(1)
-                    .price(2.0)
+                    .price(new BigDecimal("2.00"))
                     .build()
             );
 
-            o4.setTotal((2 * 3.5) + 2.5 + 2.0);
+            o4.setTotal(new BigDecimal("11.50"));
             orderRepository.save(o4);
 
 
@@ -230,7 +231,7 @@ public class DataLoader {
                     .date(LocalDateTime.now())
                     .status(OrderStatus.COMPLETED)
                     .terminal(terraza)
-                    .total(0.0)
+                    .total(BigDecimal.ZERO)
                     .build()
             );
 
@@ -238,7 +239,7 @@ public class DataLoader {
                     .order(o5)
                     .product(p.get(0)) // Pizza
                     .quantity(1)
-                    .price(8.5)
+                    .price(new BigDecimal("8.50"))
                     .build()
             );
 
@@ -246,7 +247,7 @@ public class DataLoader {
                     .order(o5)
                     .product(p.get(8)) // Helado
                     .quantity(2)
-                    .price(3.0)
+                    .price(new BigDecimal("3.00"))
                     .build()
             );
 
@@ -254,11 +255,11 @@ public class DataLoader {
                     .order(o5)
                     .product(p.get(9)) // Tarta
                     .quantity(1)
-                    .price(4.0)
+                    .price(new BigDecimal("4.00"))
                     .build()
             );
 
-            o5.setTotal(8.5 + (2 * 3.0) + 4.0);
+            o5.setTotal(new BigDecimal("18.50"));
             orderRepository.save(o5);
         };
     }

@@ -3,6 +3,7 @@ package com.fernando.proyecto1.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -11,7 +12,7 @@ public class ProductResponse {
 
     private Long id;
     private String name;
-    private Double price;
+    private BigDecimal price;
     private Boolean active;
     private Long categoryId;
     private String categoryName;

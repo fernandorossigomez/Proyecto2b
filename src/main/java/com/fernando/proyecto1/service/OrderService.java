@@ -10,7 +10,7 @@ import com.fernando.proyecto1.repository.OrderProductRepository;
 import com.fernando.proyecto1.repository.TerminalRepository;
 import org.springframework.stereotype.Service;
 import com.fernando.proyecto1.exceptions.ProductNotFoundException;
-
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -74,9 +74,10 @@ public class OrderService {
             order.getProducts().add(orderProduct);
         }
 
-        double total = order.getProducts().stream()
-                .mapToDouble(p -> p.getPrice() * p.getQuantity())
-                .sum();
+        BigDecimal total = order.getProducts().stream()
+                .map(p -> p.getPrice().multiply(
+                        BigDecimal.valueOf(p.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setTotal(total);
         orderRepository.save(order);
@@ -104,9 +105,10 @@ public class OrderService {
 
         order.getProducts().remove(orderProduct);
 
-        double total = order.getProducts().stream()
-                .mapToDouble(p -> p.getPrice() * p.getQuantity())
-                .sum();
+        BigDecimal total = order.getProducts().stream()
+                .map(p -> p.getPrice().multiply(
+                        BigDecimal.valueOf(p.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setTotal(total);
 
